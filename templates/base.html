@@ -1,0 +1,52 @@
+{% load static %}<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Portal de Noticias{% endblock %} | El Diario Tecsup</title>
+  <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="{% url 'news:home' %}">El Diario <span>Tecsup</span></a>
+      <nav class="main-nav">
+        <a href="{% url 'news:home' %}">Portada</a>
+        {% for category in nav_categories %}
+          <a href="{% url 'news:category' category.slug %}">{{ category.name }}</a>
+        {% endfor %}
+      </nav>
+    </div>
+  </header>
+
+  <div class="container layout">
+    <main class="content">
+      {% block content %}{% endblock %}
+    </main>
+
+    <aside class="sidebar">
+      {% block sidebar %}
+        <section class="widget">
+          <h3>Categorías</h3>
+          <ul class="category-list">
+            {% for category in nav_categories %}
+              <li>
+                <a href="{% url 'news:category' category.slug %}">{{ category.name }}</a>
+                <span class="count">{{ category.num_articles }}</span>
+              </li>
+            {% empty %}
+              <li>Aún no hay categorías.</li>
+            {% endfor %}
+          </ul>
+        </section>
+      {% endblock %}
+    </aside>
+  </div>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>&copy; {% now "Y" %} El Diario Tecsup &middot; Laboratorio 6 de Django</p>
+    </div>
+  </footer>
+</body>
+</html>

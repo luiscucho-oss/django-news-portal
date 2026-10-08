@@ -1,0 +1,21 @@
+<article class="card">
+  <a class="card-image" href="{% url 'news:article_detail' article.slug %}">
+    <img src="{{ article.image.url }}" alt="{{ article.title }}">
+  </a>
+  <div class="card-body">
+    <p class="card-tags">
+      {% for category in article.categories.all %}
+        <a class="tag" href="{% url 'news:category' category.slug %}">{{ category.name }}</a>
+      {% endfor %}
+    </p>
+    <h2 class="card-title">
+      <a href="{% url 'news:article_detail' article.slug %}">{{ article.title }}</a>
+    </h2>
+    <p class="card-meta">
+      Por {{ article.author.name }} &middot;
+      <time datetime="{{ article.published_at|date:'c' }}">{{ article.published_at|date:"d \d\e F \d\e Y" }}</time>
+    </p>
+    <p class="card-summary">{{ article.summary|truncatewords:25 }}</p>
+    <a class="read-more" href="{% url 'news:article_detail' article.slug %}">Leer más &rarr;</a>
+  </div>
+</article>
