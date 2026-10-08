@@ -3,11 +3,7 @@
     <img src="{{ article.image.url }}" alt="{{ article.title }}">
   </a>
   <div class="card-body">
-    <p class="card-tags">
-      {% for category in article.categories.all %}
-        <a class="tag" href="{% url 'news:category' category.slug %}">{{ category.name }}</a>
-      {% endfor %}
-    </p>
+    {% include 'news/_category_tags.html' with categories=article.categories.all %}
     <h2 class="card-title">
       <a href="{% url 'news:article_detail' article.slug %}">{{ article.title }}</a>
     </h2>

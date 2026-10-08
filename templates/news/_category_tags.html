@@ -1,0 +1,5 @@
+<p class="card-tags">
+  {% for category in categories %}
+    <a class="tag" href="{% url 'news:category' category.slug %}">{{ category.name }}</a>
+  {% endfor %}
+</p>

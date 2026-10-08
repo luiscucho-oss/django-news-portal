@@ -16,5 +16,5 @@
     {% endfor %}
   </div>
 
-  <a class="back-link" href="{% url 'news:home' %}">&larr; Volver a la portada</a>
+  {% include 'news/_back_link.html' %}
 {% endblock %}
