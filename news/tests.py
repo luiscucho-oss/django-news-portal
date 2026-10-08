@@ -1,6 +1,7 @@
 import shutil
 import tempfile
 
+from django.contrib.auth.models import User
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, override_settings
 from django.urls import reverse
@@ -70,6 +71,36 @@ class NewsTests(TestCase):
         self.assertContains(response, 'María Quispe')
         self.assertContains(response, reverse('news:category', args=['tecnologia']))
         self.assertContains(response, self.article.image.url)
+
+    def test_fragmentos_reutilizados_en_detalle_y_categoria(self):
+        detail = self.client.get(reverse('news:article_detail', args=[self.article.slug]))
+        self.assertTemplateUsed(detail, 'news/_category_tags.html')
+        self.assertTemplateUsed(detail, 'news/_back_link.html')
+        category = self.client.get(reverse('news:category', args=['tecnologia']))
+        self.assertTemplateUsed(category, 'news/_category_tags.html')
+        self.assertTemplateUsed(category, 'news/_back_link.html')
+
+    def test_cambio_en_el_admin_se_publica_en_el_sitio(self):
+        User.objects.create_superuser('editor', 'editor@example.com', 'clave-segura-123')
+        self.client.login(username='editor', password='clave-segura-123')
+        response = self.client.post(reverse('admin:news_article_change', args=[self.article.pk]), {
+            'title': 'Robot reciclador gana concurso nacional',
+            'slug': self.article.slug,
+            'summary': 'Resumen editado desde el panel.',
+            'body': 'Cuerpo editado desde el panel.',
+            'published_at_0': '2026-10-08',
+            'published_at_1': '10:00:00',
+            'author': self.author.pk,
+            'categories': [self.tech.pk, self.sports.pk],
+        })
+        self.assertRedirects(response, reverse('admin:news_article_changelist'))
+
+        page = self.client.get(reverse('news:article_detail', args=[self.article.slug]))
+        self.assertContains(page, 'Robot reciclador gana concurso nacional')
+        self.assertContains(page, 'Cuerpo editado desde el panel.')
+        self.assertContains(page, reverse('news:category', args=['deportes']))
+        self.assertContains(self.client.get(reverse('news:category', args=['deportes'])),
+                            'Robot reciclador gana concurso nacional')
 
     def test_detalle_inexistente_devuelve_404(self):
         response = self.client.get(reverse('news:article_detail', args=['no-existe']))
