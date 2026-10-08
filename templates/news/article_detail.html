@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ article.title }}{% endblock %}
+
+{% block content %}
+  <article class="article">
+    <p class="card-tags">
+      {% for category in article.categories.all %}
+        <a class="tag" href="{% url 'news:category' category.slug %}">{{ category.name }}</a>
+      {% endfor %}
+    </p>
+    <h1 class="article-title">{{ article.title }}</h1>
+    <p class="article-meta">
+      Por <strong>{{ article.author.name }}</strong> &middot;
+      <time datetime="{{ article.published_at|date:'c' }}">{{ article.published_at|date:"l, d \d\e F \d\e Y · H:i" }}</time>
+    </p>
+
+    <figure class="article-image">
+      <img src="{{ article.image.url }}" alt="{{ article.title }}">
+    </figure>
+
+    <p class="article-summary">{{ article.summary }}</p>
+    <div class="article-body">{{ article.body|linebreaks }}</div>
+
+    <a class="back-link" href="{% url 'news:home' %}">&larr; Volver a la portada</a>
+  </article>
+{% endblock %}
+
+{% block sidebar %}
+  <section class="widget">
+    <h3>Sobre el autor</h3>
+    <p><strong>{{ article.author.name }}</strong></p>
+    <p class="muted">{{ article.author.bio|default:"Sin biografía." }}</p>
+  </section>
+
+  <section class="widget">
+    <h3>Noticias relacionadas</h3>
+    <ul class="related-list">
+      {% for item in related %}
+        <li><a href="{% url 'news:article_detail' item.slug %}">{{ item.title }}</a></li>
+      {% empty %}
+        <li class="muted">No hay noticias relacionadas.</li>
+      {% endfor %}
+    </ul>
+  </section>
+
+  {{ block.super }}
+{% endblock %}
